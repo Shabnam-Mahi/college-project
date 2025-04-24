@@ -1,0 +1,29 @@
+name: Multi-Environment CI/CD
+
+on:
+  push:
+    branches:
+      - develop     # For Dev environment
+      - staging     # For Staging environment
+      - main        # For Production environment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set environment variables
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "ENV=development" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "ENV=staging" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV=production" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to ${{ env.ENV }}
+        run: echo "Deploying to ${{ env.ENV }} environment..."
